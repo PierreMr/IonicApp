@@ -1,5 +1,7 @@
 {
   "name": "UdemyFeedly",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "ionic-angular"
 }

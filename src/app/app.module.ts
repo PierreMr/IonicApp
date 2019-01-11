@@ -5,12 +5,26 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
+import { LoginPage } from '../pages/login/login';
+import { SignupPage } from '../pages/signup/signup';
+
+import firebase from 'firebase';
+
+var config = {
+  apiKey: "AIzaSyBSXnHE_syz41iq2LuHteHqOp7KMuK4oSI",
+  authDomain: "udemyfeedly.firebaseapp.com",
+  databaseURL: "https://udemyfeedly.firebaseio.com",
+  projectId: "udemyfeedly",
+  storageBucket: "udemyfeedly.appspot.com",
+  messagingSenderId: "123081422867"
+};
+firebase.initializeApp(config);
 
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    LoginPage,
+    SignupPage
   ],
   imports: [
     BrowserModule,
@@ -19,7 +33,8 @@ import { HomePage } from '../pages/home/home';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    LoginPage,
+    SignupPage
   ],
   providers: [
     StatusBar,

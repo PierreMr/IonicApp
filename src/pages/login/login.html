@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-navbar color="primary">
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-item text-center no-lines>
+    <ion-icon name="logo-rss" class="logo" color="light"></ion-icon>
+  </ion-item>
+
+  <ion-item text-center no-lines>
+    <h1>Feedly</h1>
+    <h6>An app</h6>
+  </ion-item>
+
+  <ion-grid>
+    <ion-row class="rowStyle">
+      <ion-icon name="mail" color="primary"></ion-icon>
+      <ion-input type="email" placeholder="Your email" [(ngModel)]="email"></ion-input>
+    </ion-row>
+    
+    <ion-row class="rowStyle">
+      <ion-icon name="key" color="primary"></ion-icon>
+      <ion-input type="password" placeholder="Your password" [(ngModel)]="password"></ion-input>      
+    </ion-row>
+
+    <ion-row>
+      <button ion-button block round outline color="light" margin-top (click)="login()">Login</button>
+    </ion-row>
+  </ion-grid>
+
+  <button ion-button block clear color="light" (click)="goToSignUp()">You don't have an account ? Sign up </button>
+</ion-content>
