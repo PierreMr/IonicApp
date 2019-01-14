@@ -5,6 +5,8 @@ import firebase from 'firebase';
 import moment from 'moment';
 import { LoginPage } from '../login/login';
 
+import { Camera, CameraOptions } from '@ionic-native/camera';
+
 @Component({
   selector: 'page-feed',
   templateUrl: 'feed.html',
@@ -16,8 +18,9 @@ export class FeedPage {
   postsNumber: number = 10;
   cursor: any;
   infiniteEvent: any;
+  image: string;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private loadingCtrl: LoadingController, private toastCtrl: ToastController, private camera: Camera) {
 
     this.getPosts()
   }
@@ -116,9 +119,12 @@ export class FeedPage {
       owner_name: firebase.auth().currentUser.displayName
     })
     .then((doc) => {
-      console.log(doc)
+      if (this.image) {
+        this.upload(doc.id)
+      }
 
       this.text = ""
+      this.image = undefined
 
       let toast = this.toastCtrl.create({
         message: "Your post has been created successfully.",
@@ -145,6 +151,78 @@ export class FeedPage {
         duration: 3000
       }).present()
       this.navCtrl.setRoot(LoginPage)
+    })
+  }
+
+  addPhoto() {
+    this.launchCamera()
+  }
+
+  launchCamera() {
+    let options: CameraOptions = {
+      quality: 100,
+      sourceType: this.camera.PictureSourceType.CAMERA,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.PNG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation: true,
+      targetHeight: 512,
+      targetWidth: 512,
+      allowEdit: true
+    }
+
+    this.camera.getPicture(options)
+    .then((base64Image) => {
+      console.log(base64Image)
+      this.image = "data:image/png;base64," + base64Image
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
+  upload(name: string) {
+
+    return new Promise((resolve, reject) => {
+
+      let loading = this.loadingCtrl.create({
+        content: "Uploading image..."
+      })
+      let ref = firebase.storage().ref("postImages/" + name)
+
+      let uploadTask = ref.putString(this.image.split(',')[1], "base64")
+  
+      uploadTask.on("state_changed", (taskSnapshot: any) => {
+        console.log(taskSnapshot)
+
+        let percentage = taskSnapshot.bytesTransferred / taskSnapshot.totalBytes * 100
+        loading.setContent("Uploaded " + percentage + "% ...")
+      },
+      (error) => {
+        console.log(error)
+      },
+      () => {
+        console.log("Upload completed")
+  
+        uploadTask.snapshot.ref.getDownloadURL()
+        .then((url) => {
+          firebase.firestore().collection("posts").doc(name).update({
+            image: url
+          })
+          .then(() => {
+            loading.dismiss()
+            resolve()
+          })
+          .catch((error) => {
+            loading.dismiss()
+            reject()
+          })
+        })
+        .catch((error) => {
+          loading.dismiss()
+          reject()
+        })
+      })
     })
   }
 
