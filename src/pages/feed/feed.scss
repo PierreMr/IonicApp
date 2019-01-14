@@ -1,0 +1,16 @@
+page-feed {
+
+    .rowStyle {
+        border: solid map-get($map: $colors, $key: primary) 1px;
+        border-radius: 30px;
+        margin-top: 15px;
+    }
+
+    .bottomBar {
+        background-color: map-get($map: $colors, $key: semi-light);
+
+        .border-right {
+            border-right: 1px solid map-get($map: $colors, $key: light)
+        }
+    }
+}

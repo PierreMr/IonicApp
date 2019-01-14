@@ -3,6 +3,8 @@ import { NavController, NavParams, ToastController, AlertController } from 'ioni
 
 import firebase from 'firebase';
 
+import { FeedPage } from '../feed/feed';
+
 @Component({
   selector: 'page-signup',
   templateUrl: 'signup.html',
@@ -14,7 +16,7 @@ export class SignupPage {
   password: string = ""
 
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public ToastCtrl: ToastController, public AlertCtrl: AlertController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController, public alertCtrl: AlertController) {
   }
 
   signUp() {
@@ -27,14 +29,14 @@ export class SignupPage {
         photoURL: ""
       })
       .then(() => {
-        this.AlertCtrl.create({
+        this.alertCtrl.create({
           title: "Account created",
           message: "Your account has been created successfully.",
           buttons: [
             {
               text: "OK",
               handler: () => {
-
+                this.navCtrl.setRoot(FeedPage)
               }
             }
           ]

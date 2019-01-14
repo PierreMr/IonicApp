@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, ToastController } from 'ionic-angular';
 
 import { SignupPage } from '../signup/signup';
+import { FeedPage } from '../feed/feed';
 
 import firebase from 'firebase';
 
@@ -26,6 +27,8 @@ export class LoginPage {
         message: "Welcome " + data.user.displayName,
         duration: 3000
       }).present()
+
+      this.navCtrl.setRoot(FeedPage)
     }).catch((error) => {
       this.toastCtrl.create({
         message: error.message,

@@ -1,0 +1,66 @@
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Your Feed</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only clear (click)="logout()">
+        <ion-icon name="log-out"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+
+    <ion-row class="rowStyle" margin>
+      <button ion-button icon-only color="primary" clear>
+        <ion-icon name="images"></ion-icon>
+      </button>
+
+      <ion-input type="text" placeholder="Say something.." [(ngModel)]="text"></ion-input>
+
+      <button ion-button icon-only color="primary" clear (click)="post()">
+        <ion-icon name="send"></ion-icon>
+      </button>
+    </ion-row>
+
+    <ion-refresher (ionRefresh)="refresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <ion-card *ngFor="let post of posts">
+
+      <ion-item-divider color="primary">{{ post.data().owner_name }}</ion-item-divider>
+
+      <ion-item text-wrap>
+        {{ post.data().text }}
+      </ion-item>
+
+      <ion-row class="bottomBar">
+        <ion-col>
+          <button ion-button block icon-left clear small color="primary" class="border-right">
+            <ion-icon name="thumbs-up"></ion-icon>
+            <small>12 Likes</small>
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button block icon-left clear small color="primary" class="border-right">
+            <ion-icon name="text"></ion-icon>
+            <small>12 Comments</small>
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button block icon-left clear small color="primary">
+            <small>{{ ago(post.data().created.toDate()) }} ago</small>
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-card>
+
+    <ion-infinite-scroll (ionInfinite)="loadMorePosts($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+</ion-content>
