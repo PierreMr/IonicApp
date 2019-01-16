@@ -4,10 +4,13 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
+import { HttpClientModule } from '@angular/common/http';
+
 import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { FeedPage } from '../pages/feed/feed';
+import { CommentsPage } from '../pages/comments/comments';
 
 import { Camera } from '@ionic-native/camera';
 
@@ -31,10 +34,12 @@ firebase.firestore().settings({
     MyApp,
     LoginPage,
     SignupPage,
-    FeedPage
+    FeedPage,
+    CommentsPage
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],
@@ -42,7 +47,8 @@ firebase.firestore().settings({
     MyApp,
     LoginPage,
     SignupPage,
-    FeedPage
+    FeedPage,
+    CommentsPage
   ],
   providers: [
     StatusBar,

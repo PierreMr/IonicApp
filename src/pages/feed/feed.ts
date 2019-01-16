@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController, ActionSheetController, AlertController, ModalController } from 'ionic-angular';
 
 import firebase from 'firebase';
 import moment from 'moment';
 import { LoginPage } from '../login/login';
+import { CommentsPage } from '../comments/comments';
 
 import { Camera, CameraOptions } from '@ionic-native/camera';
+
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'page-feed',
@@ -20,7 +23,7 @@ export class FeedPage {
   infiniteEvent: any;
   image: string;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private loadingCtrl: LoadingController, private toastCtrl: ToastController, private camera: Camera) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private loadingCtrl: LoadingController, private toastCtrl: ToastController, private camera: Camera, private httpClient: HttpClient, private actionSheetCtrl: ActionSheetController, private alertCtrl: AlertController, private modalCtrl: ModalController) {
 
     this.getPosts()
   }
@@ -37,23 +40,27 @@ export class FeedPage {
     .orderBy("created", "desc")
     .limit(this.postsNumber)
     
-    // query.onSnapshot((snapshot) => {
-    //   let changedDocs = snapshot.docChanges()
+    query.onSnapshot((snapshot) => {
+      let changedDocs = snapshot.docChanges()
 
-    //   changedDocs.forEach((change) => {
-    //     if (change.type == "added") {
+      changedDocs.forEach((change) => {
+        if (change.type == "added") {
 
-    //     }
+        }
 
-    //     if (change.type == "modified") {
+        if (change.type == "modified") {
+          for(let i = 0; i < this.posts.length; i++) {
+            if(this.posts[i].id == change.doc.id) {
+              this.posts[i] = change.doc
+            }
+          }
+        }
+
+        if (change.type == "removed") {
           
-    //     }
-
-    //     if (change.type == "removed") {
-          
-    //     }
-    //   })
-    // })
+        }
+      })
+    })
 
     query.get()
     .then((docs) => {
@@ -126,7 +133,7 @@ export class FeedPage {
       this.text = ""
       this.image = undefined
 
-      let toast = this.toastCtrl.create({
+      this.toastCtrl.create({
         message: "Your post has been created successfully.",
         duration: 3000
       }).present()
@@ -224,6 +231,99 @@ export class FeedPage {
         })
       })
     })
+  }
+
+  like(post) {
+    let body = {
+      postId: post.id,
+      userId: firebase.auth().currentUser.uid,
+      action: post.data().likes && post.data().likes[firebase.auth().currentUser.uid] == true ? "unlike" : "like"
+    }
+
+    let toast = this.toastCtrl.create({
+      message: "Updating like... Please wait"
+    })
+    toast.present()
+
+    this.httpClient.post("https://us-central1-udemyfeedly.cloudfunctions.net/updateLikesCount", JSON.stringify(body), {
+      responseType: "text"
+    }).subscribe((data) => {
+      toast.setMessage("Like updated.")
+      setTimeout(() => {
+        toast.dismiss()
+      }, 3000)
+
+      console.log(data)
+    },
+    (error) => {
+      toast.setMessage("An error has occured. Please try again later.")
+      setTimeout(() => {
+        toast.dismiss()
+      }, 3000);
+
+      console.log(error)      
+    })
+  }
+
+  comment(post) {
+    this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: "View all comments",
+          handler: () => {
+            this.modalCtrl.create(CommentsPage, {
+              "post": post
+            }).present()
+          }
+        },
+        {
+          text: "New comment",
+          handler: () => {
+            this.alertCtrl.create({
+              title: "New comment",
+              message: "Type your comment",
+              inputs: [
+                {
+                  name: "comment",
+                  type: "text"
+                }
+              ],
+              buttons: [
+                {
+                  text: "Cancel"
+                },
+                {
+                  text: "Post",
+                  handler: (data) => {
+                    if (data.comment) {
+                      firebase.firestore().collection("comments").add({
+                        text: data.comment,
+                        post: post.id,
+                        owner: firebase.auth().currentUser.uid,
+                        owner_name: firebase.auth().currentUser.displayName,
+                        created: firebase.firestore.FieldValue.serverTimestamp()
+                      })
+                      .then((doc) => {
+                        this.toastCtrl.create({
+                          message: "Comment has been posted successfully",
+                          duration: 3000
+                        }).present()
+                      })
+                      .catch((error) => {
+                        this.toastCtrl.create({
+                          message: error.message,
+                          duration: 3000
+                        }).present()
+                      })
+                    }
+                  }
+                }
+              ]
+            }).present()
+          }
+        }
+      ]
+    }).present()
   }
 
 }

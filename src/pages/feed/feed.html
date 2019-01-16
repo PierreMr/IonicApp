@@ -49,15 +49,15 @@
 
       <ion-row class="bottomBar">
         <ion-col>
-          <button ion-button block icon-left clear small color="primary" class="border-right">
+          <button ion-button block icon-left clear small color="primary" class="border-right" (click)="like(post)">
             <ion-icon name="thumbs-up"></ion-icon>
-            <small>12 Likes</small>
+            <small>{{ post.data().likesCount || 0 }} Likes</small>
           </button>
         </ion-col>
         <ion-col>
-          <button ion-button block icon-left clear small color="primary" class="border-right">
+          <button ion-button block icon-left clear small color="primary" class="border-right" (click)="comment(post)">
             <ion-icon name="text"></ion-icon>
-            <small>12 Comments</small>
+            <small>{{ post.data().commentsCount || 0 }} Comments</small>
           </button>
         </ion-col>
         <ion-col>
